@@ -1,0 +1,7 @@
+# Ignore Microsoft Office documents
+*.docx
+*.pdf
+
+# Ignore system files
+desktop.ini
+
