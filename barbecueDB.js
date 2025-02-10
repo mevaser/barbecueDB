@@ -73,6 +73,8 @@ db.meats.insertMany([
   }
 ]);
 
+
+
 // =============================
 // Additions Collection
 // =============================
@@ -115,11 +117,15 @@ db.additions.insertMany([
   }
 ]);
 
+
 // Use the database
+
 use barbecueDB;
+
 
 // Events Collection
 // =============================
+
 db.events.insertMany([
   {
     "_id": "event_1",
@@ -161,10 +167,9 @@ db.events.insertMany([
     },
     "participants": [
       { "user_id": "user_1", "name": "Mevaser" },
-      { "user_id": "user_2", "name": "Almog" }
-    ]
-  }
+      { "user_id": "user_2", "name": "Almog" }]}
 ]);
+
 
 db.events.insertOne({
   "_id": "event_4",
@@ -176,17 +181,20 @@ db.events.insertOne({
     "side_dishes": ["addition_3", "addition_5"]  // IDs for Garlic Confit, Tahini
   },
   "participants": [
-    { "user_id": "user_6", "name": "Emma" },
-    { "user_id": "user_7", "name": "Liam" }
+    { "user_id": "user_1", "name": "Mevaser" },
+    { "user_id": "user_2", "name": "Almog" }
   ]
 });
+
 
 
 // Use the database
 use barbecueDB;
 
+
 // Users Collection
 // =============================
+
 db.users.insertMany([
   {
     "_id": "user_1",
@@ -231,10 +239,11 @@ use barbecueDB;
 
 // Recipes Collection
 // =============================
+
 db.recipes.insertMany([
   {
     "_id": "recipe_1",
-    "name": "Goose Breast",
+    "name": "Goose Breast with Silane and Rosemary",
     "ingredients": [
       { "name": "Garlic Powder", "quantity": "1 tsp" },
       { "name": "Silane (Date Syrup)", "quantity": "2 tbsp" },
@@ -250,7 +259,7 @@ db.recipes.insertMany([
   },
   {
     "_id": "recipe_2",
-    "name": "Picanha",
+    "name": "Picanha with Silane and Garlic",
     "ingredients": [
       { "name": "Silane (Date Syrup)", "quantity": "2 tbsp" },
       { "name": "Garlic Powder", "quantity": "1 tsp" },
@@ -264,7 +273,7 @@ db.recipes.insertMany([
   },
   {
     "_id": "recipe_3",
-    "name": "Ribeye Steak (Prime Rib)",
+    "name": "Ribeye Steak (Prime Rib) reverse sear",
     "ingredients": [
       { "name": "Ribeye Steak", "quantity": "500-600g" },
       { "name": "Coarse Salt", "quantity": "1 tsp" },
@@ -278,7 +287,7 @@ db.recipes.insertMany([
   },
   {
     "_id": "recipe_4",
-    "name": "Chicken Thighs",
+    "name": "Chicken Thighs with Sweet Chili Sauce",
     "ingredients": [
       { "name": "Sweet Paprika", "quantity": "1 tbsp" },
       { "name": "Hot Paprika", "quantity": "1 tsp" },
@@ -295,7 +304,7 @@ db.recipes.insertMany([
   },
   {
     "_id": "recipe_5",
-    "name": "Denver Cut",
+    "name": "Denver Cut Steak with Salt and Pepper",
     "ingredients": [
       { "name": "Coarse Salt", "quantity": "1 tsp" },
       { "name": "Black Pepper", "quantity": "1 tsp" },
@@ -309,7 +318,7 @@ db.recipes.insertMany([
   },
   {
     "_id": "recipe_6",
-    "name": "Hanger Steak",
+    "name": "Hanger Steak with Salt and Pepper",
     "ingredients": [
       { "name": "Coarse Salt", "quantity": "1 tsp" },
       { "name": "Black Pepper", "quantity": "1 tsp" },
@@ -323,7 +332,7 @@ db.recipes.insertMany([
   },
   {
     "_id": "recipe_7",
-    "name": "Kebab",
+    "name": "Kebab with Onion and Parsley",
     "ingredients": [
       { "name": "Ground Beef", "quantity": "500g" },
       { "name": "Onion", "quantity": "1, grated" },
@@ -338,6 +347,7 @@ db.recipes.insertMany([
     "type": "Mixed Meat"
   }
 ]);
+
 
 // Add recipe_8 using a helper function
 function addRecipe(db, recipe) {
