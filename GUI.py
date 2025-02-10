@@ -3,6 +3,8 @@ from tkinter import messagebox
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 
+print("Starting GUI.py...")
+
 # Connect to MongoDB
 def connect_to_mongo():
     try:
@@ -15,7 +17,7 @@ def connect_to_mongo():
 
 def create_event_window():
     db = connect_to_mongo()
-    if not db:
+    if db is None:
         return
 
     # Get the highest existing _id in the events collection
@@ -23,9 +25,9 @@ def create_event_window():
     max_id = 0
     for event in events:
         try:
-            current_id = int(event["id"].split("")[1])
+            current_id = int(event["_id"].split("_")[1])
             max_id = max(max_id, current_id)
-        except ValueError:
+        except (ValueError, KeyError, IndexError):
             continue
 
     new_id = f"event_{max_id + 1}"
@@ -116,5 +118,5 @@ def main_window():
 
     root.mainloop()
 
-if __name__ == "_main_":
+if __name__ == "__main__":
     main_window()
