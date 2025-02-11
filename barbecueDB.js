@@ -426,51 +426,28 @@ db.events.find(
 });
 
 // Update Goose Breast Recipe
-db.recipes.updateOne(
-  { "_id": "recipe_1" },
-  { $set: { "meat_id": "meat_2" } }
-);
 db.recipes.updateMany(
-  { "_id": { $in: ["recipe_2", "recipe_3", "recipe_4", "recipe_5", "recipe_6"] } },
-  {
-    $set: {
-      "meat_id": {
-        $switch: {
-          branches: [
-            { case: { $eq: ["$_id", "recipe_2"] }, then: "meat_1" },
-            { case: { $eq: ["$_id", "recipe_3"] }, then: "meat_7" },
-            { case: { $eq: ["$_id", "recipe_4"] }, then: "meat_8" },
-            { case: { $eq: ["$_id", "recipe_5"] }, then: "meat_3" },
-            { case: { $eq: ["$_id", "recipe_6"] }, then: "meat_4" }
-          ],
-          default: null
+  { _id: { $in: ["recipe_2", "recipe_3", "recipe_4", "recipe_5", "recipe_6"] } },
+  [
+    {
+      $set: {
+        meat_id: {
+          $switch: {
+            branches: [
+              { case: { $eq: ["$_id", "recipe_2"] }, then: "meat_1" },
+              { case: { $eq: ["$_id", "recipe_3"] }, then: "meat_7" },
+              { case: { $eq: ["$_id", "recipe_4"] }, then: "meat_8" },
+              { case: { $eq: ["$_id", "recipe_5"] }, then: "meat_3" },
+              { case: { $eq: ["$_id", "recipe_6"] }, then: "meat_4" }
+            ],
+            default: null
+          }
         }
       }
     }
-  }
+  ]
 );
 
-db.recipes.updateMany(
-  {},
-  { $set: { "rating": 5 } }
-);
-db.recipes.updateOne(
-  { "_id": "recipe_1" },
-  { $addToSet: { "ingredients": { "name": "Butter", "quantity": "2 tbsp" } } }
-);
-db.recipes.updateOne(
-  { "_id": "recipe_2" },
-  { $inc: { "preparation_time": 1 } }
-);
-
-db.recipes.updateOne(
-  { "_id": "recipe_3" },
-  { $pull: { "ingredients": { "name": "Salt" } } }
-);
-db.recipes.updateOne(
-  { "_id": "recipe_3" },
-  { $push: { "ingredients": { "name": "salt" } } }
-);
 
 db.recipes.aggregate([
   {
