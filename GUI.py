@@ -174,10 +174,9 @@ def create_event_window():
             continue
     new_id = f"event_{max_id + 1}"
 
-    # Create mapping dictionaries for recipes and side dishes.
-    recipes_mapping = {}
+    # Create mapping dictionaries for meats and side dishes.
+    meats_mapping = {}
     additions_mapping = {}
-    # (We will rebuild the user mapping when saving the event.)
 
     create_event_win = tk.Toplevel()
     create_event_win.title("Create Event")
@@ -196,15 +195,19 @@ def create_event_window():
     event_location_entry = tk.Entry(create_event_win, width=30)
     event_location_entry.grid(row=3, column=1, pady=5)
 
-    # Recipes Listbox: display names, store _id in mapping.
-    tk.Label(create_event_win, text="Select Recipes:").grid(row=4, column=0, sticky=tk.W)
-    recipes_listbox = tk.Listbox(create_event_win, selectmode=tk.MULTIPLE, width=30, height=5, exportselection=False)
-    recipes_listbox.grid(row=4, column=1, pady=5)
-    for i, recipe in enumerate(db["recipes"].find({}, {"_id": 1, "name": 1})):
-        recipes_listbox.insert(tk.END, recipe["name"])
-        recipes_mapping[i] = recipe["_id"]
+    # ---------------------------
+    # Meats Listbox: Query the 'meats' collection
+    # ---------------------------
+    tk.Label(create_event_win, text="Select Meats:").grid(row=4, column=0, sticky=tk.W)
+    meats_listbox = tk.Listbox(create_event_win, selectmode=tk.MULTIPLE, width=30, height=5, exportselection=False)
+    meats_listbox.grid(row=4, column=1, pady=5)
+    for i, meat in enumerate(db["meats"].find({}, {"_id": 1, "type": 1})):
+        meats_listbox.insert(tk.END, meat["type"])
+        meats_mapping[i] = meat["_id"]
 
-    # Side Dishes Listbox: display names, store _id in mapping.
+    # ---------------------------
+    # Side Dishes Listbox: (unchanged)
+    # ---------------------------
     tk.Label(create_event_win, text="Select Side Dishes:").grid(row=5, column=0, sticky=tk.W)
     side_dishes_listbox = tk.Listbox(create_event_win, selectmode=tk.MULTIPLE, width=30, height=5, exportselection=False)
     side_dishes_listbox.grid(row=5, column=1, pady=5)
@@ -212,15 +215,15 @@ def create_event_window():
         side_dishes_listbox.insert(tk.END, addition["name"])
         additions_mapping[i] = addition["_id"]
 
-    # Participants Listbox: display names.
+    # ---------------------------
+    # Participants Listbox: (unchanged)
+    # ---------------------------
     tk.Label(create_event_win, text="Select Participants:").grid(row=6, column=0, sticky=tk.W)
     users_listbox = tk.Listbox(create_event_win, selectmode=tk.MULTIPLE, width=30, height=5, exportselection=False)
     users_listbox.grid(row=6, column=1, pady=5)
-    # Initially populate the users_listbox
     users_cursor = list(db["users"].find({}, {"_id": 1, "name": 1}))
     for user in users_cursor:
         users_listbox.insert(tk.END, user["name"])
-    # (We won't keep a static users_mapping here.)
 
     def save_event_to_mongo():
         event_name = event_name_entry.get().strip()
@@ -231,17 +234,16 @@ def create_event_window():
             messagebox.showerror("Error", "All fields must be filled!")
             return
 
-        # Use the existing mappings for recipes and side dishes.
-        selected_recipe_indices = recipes_listbox.curselection()
-        selected_recipes = [recipes_mapping[i] for i in selected_recipe_indices]
+        # Get the selected meat IDs
+        selected_meat_indices = meats_listbox.curselection()
+        selected_meats = [meats_mapping[i] for i in selected_meat_indices]
 
+        # Get the selected side dishes
         selected_addition_indices = side_dishes_listbox.curselection()
         selected_side_dishes = [additions_mapping[i] for i in selected_addition_indices]
 
         # Rebuild the users mapping from the current users_listbox contents.
         updated_users_mapping = {}
-        # Since the listbox items are in order, we can assume that index i corresponds to the
-        # i-th document from our users query.
         users_cursor = list(db["users"].find({}, {"_id": 1, "name": 1}))
         for i, user in enumerate(users_cursor):
             updated_users_mapping[i] = (user["_id"], user["name"])
@@ -261,7 +263,7 @@ def create_event_window():
             "date": event_date,
             "location": event_location,
             "menu": {
-                "meats": selected_recipes,
+                "meats": selected_meats,
                 "side_dishes": selected_side_dishes
             },
             "participants": participants_data
@@ -377,24 +379,28 @@ def edit_event_window(event_id, events_listbox, details_text):
     event_location_entry.grid(row=3, column=1, pady=5)
     event_location_entry.insert(0, event.get("location", ""))
 
-    # Create mapping dictionaries for recipes, side dishes, and users.
-    recipes_mapping = {}
+    # Create mapping dictionaries for meats, side dishes, and users.
+    meats_mapping = {}
     additions_mapping = {}
     users_mapping = {}
 
-    # Recipes Listbox
-    tk.Label(edit_win, text="Select Recipes:").grid(row=4, column=0, sticky=tk.W)
-    recipes_listbox = tk.Listbox(edit_win, selectmode=tk.MULTIPLE, width=30, height=5, exportselection=False)
-    recipes_listbox.grid(row=4, column=1, pady=5)
-    recipes = list(db["recipes"].find({}, {"_id": 1, "name": 1}))
-    current_recipe_ids = event.get("menu", {}).get("meats", [])
-    for i, recipe in enumerate(recipes):
-        recipes_listbox.insert(tk.END, recipe["name"])
-        recipes_mapping[i] = recipe["_id"]
-        if recipe["_id"] in current_recipe_ids:
-            recipes_listbox.selection_set(i)
+    # ---------------------------
+    # Meats Listbox: Query the 'meats' collection
+    # ---------------------------
+    tk.Label(edit_win, text="Select Meats:").grid(row=4, column=0, sticky=tk.W)
+    meats_listbox = tk.Listbox(edit_win, selectmode=tk.MULTIPLE, width=30, height=5, exportselection=False)
+    meats_listbox.grid(row=4, column=1, pady=5)
+    meats = list(db["meats"].find({}, {"_id": 1, "type": 1}))
+    current_meat_ids = event.get("menu", {}).get("meats", [])
+    for i, meat in enumerate(meats):
+        meats_listbox.insert(tk.END, meat["type"])
+        meats_mapping[i] = meat["_id"]
+        if meat["_id"] in current_meat_ids:
+            meats_listbox.selection_set(i)
 
-    # Side Dishes Listbox
+    # ---------------------------
+    # Side Dishes Listbox: (unchanged)
+    # ---------------------------
     tk.Label(edit_win, text="Select Side Dishes:").grid(row=5, column=0, sticky=tk.W)
     side_dishes_listbox = tk.Listbox(edit_win, selectmode=tk.MULTIPLE, width=30, height=5, exportselection=False)
     side_dishes_listbox.grid(row=5, column=1, pady=5)
@@ -406,7 +412,9 @@ def edit_event_window(event_id, events_listbox, details_text):
         if addition["_id"] in current_addition_ids:
             side_dishes_listbox.selection_set(i)
 
-    # Participants Listbox
+    # ---------------------------
+    # Participants Listbox: (unchanged)
+    # ---------------------------
     tk.Label(edit_win, text="Select Participants:").grid(row=6, column=0, sticky=tk.W)
     users_listbox = tk.Listbox(edit_win, selectmode=tk.MULTIPLE, width=30, height=5, exportselection=False)
     users_listbox.grid(row=6, column=1, pady=5)
@@ -418,14 +426,15 @@ def edit_event_window(event_id, events_listbox, details_text):
         if user["_id"] in current_user_ids:
             users_listbox.selection_set(i)
 
-    tk.Button(edit_win, text="Add User", command=lambda: add_user_window(users_listbox)).grid(row=7, column=0, sticky=tk.W, pady=10, padx=5)
+    tk.Button(edit_win, text="Add User", command=lambda: add_user_window(users_listbox))\
+        .grid(row=7, column=0, sticky=tk.W, pady=10, padx=5)
 
     def save_edited_event():
         new_name = event_name_entry.get()
         new_date = event_date_entry.get()
         new_location = event_location_entry.get()
-        selected_recipe_indices = recipes_listbox.curselection()
-        selected_recipes = [recipes_mapping[i] for i in selected_recipe_indices]
+        selected_meat_indices = meats_listbox.curselection()
+        selected_meats = [meats_mapping[i] for i in selected_meat_indices]
         selected_addition_indices = side_dishes_listbox.curselection()
         selected_side_dishes = [additions_mapping[i] for i in selected_addition_indices]
         selected_user_indices = users_listbox.curselection()
@@ -441,7 +450,7 @@ def edit_event_window(event_id, events_listbox, details_text):
             "date": new_date,
             "location": new_location,
             "menu": {
-                "meats": selected_recipes,
+                "meats": selected_meats,
                 "side_dishes": selected_side_dishes
             },
             "participants": participants_data
@@ -454,8 +463,11 @@ def edit_event_window(event_id, events_listbox, details_text):
         except Exception as e:
             messagebox.showerror("Error", f"Failed to update event: {e}")
 
-    tk.Button(edit_win, text="Save Changes", command=save_edited_event).grid(row=8, column=1, sticky=tk.E, pady=10, padx=5)
-    tk.Button(edit_win, text="Exit", command=edit_win.destroy).grid(row=8, column=0, sticky=tk.W, pady=10, padx=5)
+    tk.Button(edit_win, text="Save Changes", command=save_edited_event)\
+        .grid(row=8, column=1, sticky=tk.E, pady=10, padx=5)
+    tk.Button(edit_win, text="Exit", command=edit_win.destroy)\
+        .grid(row=8, column=0, sticky=tk.W, pady=10, padx=5)
+
 
 # ---------------------------
 # Main Window: Event List and Details
